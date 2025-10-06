@@ -1,10 +1,41 @@
-import Spline from '@splinetool/react-spline';
+import React, { lazy, Suspense } from 'react';
+
+const Spline = lazy(() => import('@splinetool/react-spline'));
+
+class SplineBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch(error, info) {
+    console.error('Spline render error:', error, info);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="h-full w-full bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800" />
+      );
+    }
+    return this.props.children;
+  }
+}
 
 export default function Hero() {
   return (
-    <section className="relative" id="home">
+    <section className="relative min-h-[70vh]" id="home">
       <div className="absolute inset-0">
-        <Spline scene="https://prod.spline.design/4mUeODmY7kxU7nQy/scene.splinecode" style={{ width: '100%', height: '100%' }} />
+        <SplineBoundary>
+          <Suspense
+            fallback={
+              <div className="h-full w-full bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800" />
+            }
+          >
+            <Spline scene="https://prod.spline.design/4mUeODmY7kxU7nQy/scene.splinecode" style={{ width: '100%', height: '100%' }} />
+          </Suspense>
+        </SplineBoundary>
       </div>
 
       <div className="relative z-10">
